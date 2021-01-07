@@ -19,6 +19,9 @@ ko.bindingHandlers['checked'] = {
         // This binding tells the control that the items in the array will be observable objects
         var checkedArrayContainsObservables = allBindings['has']('checkedArrayContainsObservables') && allBindings.get('checkedArrayContainsObservables');
 
+        // custom comparer for checkedValue
+        var checkedValueComparer = allBindings.get('checkedValueComparer');
+
         function updateModel() {
             // This updates the model value from the view value.
             // It runs in response to DOM events (click) and changes in checkedValue.
@@ -48,13 +51,13 @@ ko.bindingHandlers['checked'] = {
                     // currently checked, replace the old elem value with the new elem value
                     // in the model array.
                     if (isChecked) {
-                        ko.utils.addOrRemoveItem(writableValue, elemValue, true, checkedArrayContainsObservables);
-                        ko.utils.addOrRemoveItem(writableValue, saveOldValue, false, checkedArrayContainsObservables);
+                        ko.utils.addOrRemoveItem(writableValue, elemValue, true, checkedArrayContainsObservables, checkedValueComparer);
+                        ko.utils.addOrRemoveItem(writableValue, saveOldValue, false, checkedArrayContainsObservables, checkedValueComparer);
                     }
                 } else {
                     // When we're responding to the user having checked/unchecked a checkbox,
                     // add/remove the element value to the model array.
-                    ko.utils.addOrRemoveItem(writableValue, elemValue, isChecked, checkedArrayContainsObservables);
+                    ko.utils.addOrRemoveItem(writableValue, elemValue, isChecked, checkedArrayContainsObservables, checkedValueComparer);
                 }
 
                 if (rawValueIsNonArrayObservable && ko.isWriteableObservable(modelValue)) {
@@ -68,6 +71,8 @@ ko.bindingHandlers['checked'] = {
                         elemValue = undefined;
                     }
                 }
+                if (typeof elemValue === "object") {
+                }
                 ko.expressionRewriting.writeValueToProperty(modelValue, allBindings, 'checked', elemValue, true);
             }
         };
@@ -80,7 +85,7 @@ ko.bindingHandlers['checked'] = {
 
             if (valueIsArray) {
                 // When a checkbox is bound to an array, being checked represents its value being present in that array
-                element.checked = ko.utils.arrayIndexOf(modelValue, elemValue, checkedArrayContainsObservables) >= 0;
+                element.checked = ko.utils.arrayIndexOf(modelValue, elemValue, checkedArrayContainsObservables, checkedValueComparer) >= 0;
                 oldElemValue = elemValue;
             } else if (isCheckbox && elemValue === undefined) {
                 // When a checkbox is bound to any other value (not an array) and "checkedValue" is not defined,
@@ -88,7 +93,11 @@ ko.bindingHandlers['checked'] = {
                 element.checked = !!modelValue;
             } else {
                 // Otherwise, being checked means that the checkbox or radio button's value corresponds to the model value
-                element.checked = (checkedValue() === modelValue);
+                if (checkedValueComparer) {
+                    element.checked = (checkedValueComparer(checkedValue()) === checkedValueComparer(modelValue));
+                } else {
+                    element.checked = (checkedValue() === modelValue);
+                }
             }
         };
 

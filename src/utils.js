@@ -107,21 +107,26 @@ ko.utils = (function () {
             }
         },
 
-        arrayIndexOf: function (array, item, unwrapArrayElements) {
-            if (unwrapArrayElements) {
-                var itemToCompare = ko.utils.peekObservable(item);
-                for (var i = 0, j = array.length; i < j; i++)
-                    if (ko.utils.peekObservable(array[i]) === itemToCompare)
-                        return i;
-            }
-            else {
-                if (typeof Array.prototype.indexOf == "function")
-                    return Array.prototype.indexOf.call(array, item);
-                for (var i = 0, j = array.length; i < j; i++)
-                    if (array[i] === item)
-                        return i;
-            }
-            return -1;
+        arrayIndexOf: function (array, item, unwrapArrayElements, comparer) {
+            comparer = comparer || function(i) { return i; };
+            return ko.dependencyDetection.ignore(function () {
+                if (unwrapArrayElements) {
+                    var itemToCompare = comparer(ko.unwrap(item));
+                    for (var i = 0, j = array.length; i < j; i++)
+                        if (comparer(ko.unwrap(array[i])) === itemToCompare)
+                            return i;
+                }
+                else {
+                    if (!comparer && typeof Array.prototype.indexOf == "function")
+                        return Array.prototype.indexOf.call(array, item);
+
+                    var itemToCompare = comparer(item);
+                    for (var i = 0, j = array.length; i < j; i++)
+                        if (comparer(array[i]) === itemToCompare)
+                            return i;
+                }
+                return -1;
+            });
         },
 
         arrayFirst: function (array, predicate, predicateOwner) {
@@ -181,8 +186,8 @@ ko.utils = (function () {
             return array;
         },
 
-        addOrRemoveItem: function(array, value, included, wrapArrayElements) {
-            var existingEntryIndex = ko.utils.arrayIndexOf(ko.utils.peekObservable(array), value, wrapArrayElements);
+        addOrRemoveItem: function(array, value, included, wrapArrayElements, comparer) {
+            var existingEntryIndex = ko.utils.arrayIndexOf(ko.utils.peekObservable(array), value, wrapArrayElements, comparer);
 
             if (wrapArrayElements && !ko.isObservable(value)) {
                 value = ko.observable(value);
