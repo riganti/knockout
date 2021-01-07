@@ -9,7 +9,7 @@ function test_creatingVMs() {
 
     ko.applyBindings(myViewModel);
     ko.applyBindings(myViewModel, document.body, (ctx) => { ctx.x = "test"; });
-    ko.applyBindings(myViewModel, document.getElementById('someElementId'));
+    ko.applyBindings(myViewModel, document.getElementById('someElementId')!);
 
     myViewModel.personName();
     myViewModel.personName('Mary');
@@ -725,6 +725,56 @@ function test_Components() {
 function testUnwrapUnion(this: any) {
     let possibleObs: ko.Observable<number> | number = this.getValue();
     const num = ko.unwrap(possibleObs);
+}
+
+function testToJS() {
+    const obj: {
+        foo: string
+        bar: string
+    } = ko.toJS({ foo: ko.observable(''), bar: '' })
+
+    const arr: {
+        foo: string
+        bar: string
+    }[] = ko.toJS([{ foo: ko.observable(''), bar: '' }])
+
+    const observableArr: {
+        foo: string
+        bar: string
+    }[] = ko.toJS(ko.observableArray([
+        ko.observable({ foo: ko.observable(''), bar: '' }),
+        ko.observable({ foo: ko.observable(''), bar: ko.observable('') })
+    ]))
+
+    const plainObservableWithArray: {
+        foo: string
+        bar: string
+    }[] = ko.toJS(ko.observable([
+        ko.observable({ foo: ko.observable(''), bar: '' }),
+        ko.observable({ foo: ko.observable(''), bar: '' })
+    ]))
+
+    // const recursive: string = ko.toJS(ko.observable(ko.observable(ko.observable(''))))
+
+    const recursiveObj: {
+        foo: {
+            bar: string
+        }
+    } = ko.toJS(
+        ko.observable({
+            foo: ko.observable({ bar: ko.observable('') })
+        })
+    )
+
+    const builtins: {
+        date: Date
+        regexp: RegExp
+        func: (v: string) => string
+    } = ko.toJS({
+        date: new Date(),
+        regexp: /foo/,
+        func: (v: string) => ''
+    })
 }
 
 
