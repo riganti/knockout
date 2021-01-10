@@ -111,9 +111,9 @@ ko.utils = (function () {
             comparer = comparer || function(i) { return i; };
             return ko.dependencyDetection.ignore(function () {
                 if (unwrapArrayElements) {
-                    var itemToCompare = comparer(ko.unwrap(item));
+                    var itemToCompare = comparer(ko.utils.unwrapObservable(item));
                     for (var i = 0, j = array.length; i < j; i++)
-                        if (comparer(ko.unwrap(array[i])) === itemToCompare)
+                        if (comparer(ko.utils.unwrapObservable(array[i])) === itemToCompare)
                             return i;
                 }
                 else {
