@@ -1,10 +1,10 @@
-ko.observableArray = function (initialValues) {
+ko.observableArray = function (initialValues, validator) {
     initialValues = initialValues || [];
 
     if (typeof initialValues != 'object' || !('length' in initialValues))
         throw new Error("The argument passed when initializing an observable array must be an array, or null, or undefined.");
 
-    var result = ko.observable(initialValues);
+    var result = ko.observable(initialValues, validator);
     ko.utils.setPrototypeOfOrExtend(result, ko.observableArray['fn']);
     return result.extend({'trackArrayChanges':true});
 };
