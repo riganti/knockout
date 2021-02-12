@@ -1,12 +1,13 @@
 var observableLatestValue = ko.utils.createSymbolOrString('_latestValue');
 
-ko.observable = function (initialValue) {
+ko.observable = function (initialValue, validator) {
     function observable() {
         if (arguments.length > 0) {
             // Write
 
             // Ignore writes if the value hasn't changed
             if (observable.isDifferent(observable[observableLatestValue], arguments[0])) {
+                if (validator) validator(arguments[0])
                 observable.valueWillMutate();
                 observable[observableLatestValue] = arguments[0];
                 observable.valueHasMutated();
