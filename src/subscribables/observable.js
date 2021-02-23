@@ -7,9 +7,12 @@ ko.observable = function (initialValue, validator) {
 
             // Ignore writes if the value hasn't changed
             if (observable.isDifferent(observable[observableLatestValue], arguments[0])) {
-                if (validator) validator(arguments[0])
+                var newValue = arguments[0];
+                if (validator) {
+                    newValue = validator.call(observable, newValue);
+                }
                 observable.valueWillMutate();
-                observable[observableLatestValue] = arguments[0];
+                observable[observableLatestValue] = newValue;
                 observable.valueHasMutated();
             }
             return this; // Permits chained assignments
