@@ -1,4 +1,5 @@
 var observableLatestValue = ko.utils.createSymbolOrString('_latestValue');
+var observableValidator = ko.utils.createSymbolOrString('_validator');
 
 ko.observable = function (initialValue, validator) {
     function observable() {
@@ -28,6 +29,7 @@ ko.observable = function (initialValue, validator) {
     }
 
     observable[observableLatestValue] = initialValue;
+    observable[observableValidator] = validator;
 
     // Inherit from 'subscribable'
     if (!ko.utils.canSetPrototype) {
