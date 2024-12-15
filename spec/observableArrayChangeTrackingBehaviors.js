@@ -237,18 +237,24 @@ describe('Observable Array change tracking', function() {
             //     { status: 'deleted', value: 'First', index: 0, moved: 1 },
             //     { status: 'added', value: 'First', index: 1, moved: 0 }
             // which is also valid.
+            expect(ko.toJS(myArray)).toEqual([ 'First', 'X', 'Blah', 'Another', 'New2' ])
             testKnownOperation(myArray, 'splice', {
                 args: [0, 2, 'X', 'First'],
                 result: ['X', 'First', 'Blah', 'Another', 'New2'],
                 changes: [
-                    { status: 'added', value: 'X', index: 0, moved: 1 },
-                    { status: 'deleted', value: 'First', index: 0, moved: 1 },
-                    { status: 'added', value: 'First', index: 1, moved: 0 },
-                    { status: 'deleted', value: 'X', index: 1, moved: 0 }
+                    // with cacheDiffForKnownOperation enabled:
+                    // { status: 'added', value: 'X', index: 0, moved: 1 },
+                    // { status: 'deleted', value: 'First', index: 0, moved: 1 },
+                    // { status: 'added', value: 'First', index: 1, moved: 0 },
+                    // { status: 'deleted', value: 'X', index: 1, moved: 0 }
+
+                    // with ko.utils.compareArrays instead:
+                    { status : 'added', value : 'X', index : 0, moved : 1 },
+                    { status : 'deleted', value : 'X', index : 1, moved : 0 }
                 ]
             });
 
-            expect(callLog.length).toBe(0); // Never needed to run the diff algorithm
+            // expect(callLog.length).toBe(0); Optimization removed
         });
     });
 
@@ -542,7 +548,7 @@ describe('Observable Array change tracking', function() {
                 expect(changelist).toEqual([
                     { status: 'added', value: 'Delta', index: 3 }
                 ]);
-                expect(callLog.length).toBe(0);
+                // expect(callLog.length).toBe(0); Optimization removed
 
                 // multiple operations
                 myArray.push('Epsilon');
@@ -552,7 +558,7 @@ describe('Observable Array change tracking', function() {
                     { status: 'added', value: 'Epsilon', index: 4 },
                     { status: 'added', value: 'Zeta', index: 5 }
                 ]);
-                expect(callLog.length).toBe(1);
+                // expect(callLog.length).toBe(1); Optimization removed
 
                 // multiple operations that cancel out
                 changelist = undefined;
@@ -560,7 +566,7 @@ describe('Observable Array change tracking', function() {
                 myArray.pop();
                 jasmine.Clock.tick(1);
                 expect(changelist).toBeUndefined();
-                expect(callLog.length).toBe(2);
+                // expect(callLog.length).toBe(2); Optimization removed
             });
         });
     });

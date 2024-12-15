@@ -129,7 +129,6 @@ ko.utils.arrayForEach(["pop", "push", "reverse", "shift", "sort", "splice", "uns
         // (for consistency with mutating regular observables)
         var underlyingArray = this.peek();
         this.valueWillMutate();
-        this.cacheDiffForKnownOperation(underlyingArray, methodName, arguments);
         var methodCallResult = underlyingArray[methodName].apply(underlyingArray, arguments);
 
         applyObservableValidatorIfExists.call(this, underlyingArray);
