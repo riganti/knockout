@@ -5,7 +5,7 @@ ko.observableArray = function (initialValues, validator) {
         throw new Error("The argument passed when initializing an observable array must be an array, or null, or undefined.");
 
     var result = ko.observable(initialValues, validator);
-    ko.utils.setPrototypeOfOrExtend(result, ko.observableArray['fn']);
+    Object.setPrototypeOf(result, ko.observableArray['fn']);
     return result.extend({'trackArrayChanges':true});
 };
 
@@ -105,11 +105,7 @@ ko.observableArray['fn'] = {
     }
 };
 
-// Note that for browsers that don't support proto assignment, the
-// inheritance chain is created manually in the ko.observableArray constructor
-if (ko.utils.canSetPrototype) {
-    ko.utils.setPrototypeOf(ko.observableArray['fn'], ko.observable['fn']);
-}
+Object.setPrototypeOf(ko.observableArray['fn'], ko.observable['fn']);
 
 function applyObservableValidatorIfExists(underlyingArray) {
     if (this[observableValidator]) {

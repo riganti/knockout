@@ -366,12 +366,7 @@ describe('Observable Array', function() {
         expect(instance.customFunc()).toEqual([123]);
     });
 
-    it('Should have access to functions added to "fn" on existing instances on supported browsers', function () {
-        // On unsupported browsers, there's nothing to test
-        if (!jasmine.browserSupportsProtoAssignment) {
-            return;
-        }
-
+    it('Should have access to functions added to "fn" on existing instances', function () {
         this.after(function() {
             delete ko.observable.fn.customFunction1;
             delete ko.observableArray.fn.customFunction2;

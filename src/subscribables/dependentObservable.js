@@ -58,15 +58,10 @@ ko.computed = ko.dependentObservable = function (evaluatorFunctionOrOptions, eva
     computedObservable[computedState] = state;
     computedObservable.hasWriteFunction = typeof writeFunction === "function";
 
-    // Inherit from 'subscribable'
-    if (!ko.utils.canSetPrototype) {
-        // 'subscribable' won't be on the prototype chain unless we put it there directly
-        ko.utils.extend(computedObservable, ko.subscribable['fn']);
-    }
     ko.subscribable['fn'].init(computedObservable);
 
     // Inherit from 'computed'
-    ko.utils.setPrototypeOfOrExtend(computedObservable, computedFn);
+    Object.setPrototypeOf(computedObservable, computedFn);
 
     if (options['pure']) {
         state.pure = true;
@@ -500,11 +495,7 @@ var deferEvaluationOverrides = {
     }
 };
 
-// Note that for browsers that don't support proto assignment, the
-// inheritance chain is created manually in the ko.computed constructor
-if (ko.utils.canSetPrototype) {
-    ko.utils.setPrototypeOf(computedFn, ko.subscribable['fn']);
-}
+Object.setPrototypeOf(computedFn, ko.subscribable['fn']);
 
 // Set the proto values for ko.computed
 var protoProp = ko.observable.protoProperty; // == "__ko_proto__"
