@@ -20,12 +20,6 @@ ko.utils = (function () {
         return target;
     }
 
-    function setPrototypeOf(obj, proto) {
-        obj.__proto__ = proto;
-        return obj;
-    }
-
-    var canSetPrototype = ({ __proto__: [] } instanceof Array);
     var canUseSymbols = !DEBUG && typeof Symbol === 'function';
 
     // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
@@ -202,13 +196,7 @@ ko.utils = (function () {
             }
         },
 
-        canSetPrototype: canSetPrototype,
-
         extend: extend,
-
-        setPrototypeOf: setPrototypeOf,
-
-        setPrototypeOfOrExtend: canSetPrototype ? setPrototypeOf : extend,
 
         objectForEach: objectForEach,
 

@@ -608,7 +608,7 @@ function test_customObservable() {
         // Initialise the observableAttribute as a subscribable
         // Then override the prototype to make it a subclass
         ko.subscribable.fn.init(observableAttribute);
-        (<any>observableAttribute).__proto__ = observableAttribute_fn;
+        (<any>Object).setPrototypeOf(observableAttribute, observableAttribute_fn);
 
         // setup the deferred update extender if needed
         ko.options['deferUpdates'] && ko.extenders['deferred'](observableAttribute, true);
